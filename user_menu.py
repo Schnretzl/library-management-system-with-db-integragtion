@@ -1,9 +1,17 @@
 from user import User
 
-def add_user(users):
+def add_user(conn):
     name = input("Enter the name of the user: ")
-    users.append(User(name))
-    print(f"{name} added to the system successfully.\n")
+    # users.append(User(name))
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (name) VALUES (%s)", (name,))
+            print(f"{name} added to the system successfully.")
+            conn.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+    print()
     
 def view_user_details(users):
     user_id = get_valid_user_id()
