@@ -1,7 +1,7 @@
 import user_menu
 from book import Book
 from user import User
-from connect_mysql import connect_database
+# from connect_mysql import connect_database
 
 def add_book(conn):
     title = input("Enter the title of the book: ")
@@ -13,7 +13,7 @@ def add_book(conn):
         try:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM authors WHERE name = %s", (author,))
-            author_id = cursor.fetchone()[0]
+            author_id = cursor.fetchone()[0] if cursor.fetchone() else None
             if author_id is None:
                 # Add author to Author database if missing
                 cursor.execute("INSERT INTO authors (name) VALUES (%s)", (author,))
