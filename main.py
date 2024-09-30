@@ -1,5 +1,6 @@
 from book import Book; from user import User; from author import Author
 import book_menu, user_menu, author_menu
+from connect_mysql import connect_database
 
 def validate_menu_option(user_choice, max_menu_options):
     try:
@@ -47,6 +48,7 @@ def author_operations_menu():
     return choice if validate_menu_option(choice, 3) else "Invalid choice in author menu"
 
 def main():
+    conn = connect_database()
     authors = [Author("J.R.R. Tolkien", "Biography of J.R.R. Tolkien")]
     books = [Book("Lord of the Rings", "J.R.R. Tolkien", "fantasy", "1954")]
     users = [User("John Doe")]
@@ -55,7 +57,7 @@ def main():
         if main_menu_choice == '1':
             book_menu_choice = book_operations_menu()
             if book_menu_choice == '1':
-                book_menu.add_book(books)
+                book_menu.add_book(conn)
             elif book_menu_choice == '2':
                 book_menu.borrow_book(books, users)
             elif book_menu_choice == '3':
