@@ -87,21 +87,22 @@ def search_book(conn):
             print(f"Error: {e}")
     return True
 
-def display_books(books):
-    if not books:
-        print("No books available.")
-        return False
-    for index, book in enumerate(books):
-        print(f"{index + 1}. {book.title}")
+def display_books(conn):
+    if conn is not None:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM books")
+        books = cursor.fetchall()
+        if not books:
+            print("No books in library.")
+            return False
+        print("\nBooks in library:")
+        for index, book in enumerate(books):
+            print(f"{index + 1}. {book[1]}")
     print()
     return True
 
 def find_book_index(conn, title):
     #Return the index of the book, or None if the book is not found
-    # for index, book in enumerate(books):
-    #     if book.title == title:
-    #         return index
-    # return None
     if conn is not None:
         try:
             cursor = conn.cursor()
