@@ -1,7 +1,6 @@
 import user_menu
 from book import Book
 from user import User
-# from connect_mysql import connect_database
 
 def add_book(conn):
     title = input("Enter the title of the book: ")
@@ -66,17 +65,26 @@ def return_book(books, users):
         print("Book is already available.")
         return False
     
-def search_book(books):
+def search_book(conn):
     title = input("Enter the title of the book: ")
-    book_title_index = find_book_index(books, title)
+    book_title_index = find_book_index(conn, title)
     if book_title_index is None:
         print("Book not found.")
         return False
-    print(f"Title: {books[book_title_index].title}")
-    print(f"Author: {books[book_title_index].author}")
-    print(f"Genre: {books[book_title_index].genre}")
-    print(f"Publication Date: {books[book_title_index].publication_date}")
-    print(f"Availability: {'Available' if books[book_title_index].is_available else 'Not Available'}")
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM books WHERE id = %s", (book_title_index,))
+            book = cursor.fetchone()
+            print(f"Title: {book[1]}")
+            cursor.execute("SELECT * FROM authors WHERE id = %s", (book[2],))
+            author = cursor.fetchone()
+            print(f"Author: {author[1]}")
+            print(f"Genre: {book[3]}")
+            print(f"Publication Date: {book[4]}")
+            print(f"Availability: {'Available' if book[5] else 'Not Available'}")
+        except Exception as e:
+            print(f"Error: {e}")
     return True
 
 def display_books(books):
@@ -101,5 +109,7 @@ def find_book_index(conn, title):
             book = cursor.fetchone()
             if book:
                 return book[0]
+            else:
+                return None
         except Exception as e:
             print(f"Error: {e}")
