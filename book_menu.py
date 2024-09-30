@@ -3,17 +3,24 @@ from book import Book
 from user import User
 from connect_mysql import connect_database
 
-def add_book(books):
+def add_book(conn):
     title = input("Enter the title of the book: ")
     author = input("Enter the author of the book: ")
     genre = input("Enter the genre of the book: ")
     publication_date = input("Enter the publication date of the book: ")
     # books.append(Book(title, author, genre, publication_date))
-    conn = connect_database()
     if conn is not None:
         try:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO books (title, author, genre, publication_date) VALUES (%s, %s, %s, %s)", (title, author, genre, publication_date))
+            cursor.execute("SELECT * FROM authors WHERE name = %s", (author,))
+            author_id = cursor.fetchone()[0]
+            if author_id is None:
+                # Add author to Author database if missing
+                cursor.execute("INSERT INTO authors (name) VALUES (%s)", (author,))
+                conn.commit()
+                cursor.execute("SELECT * FROM authors WHERE name = %s", (author,))
+                author_id = cursor.fetchone()[0]
+            cursor.execute("INSERT INTO books (title, author_id, publication_date, genre) VALUES (%s, %s, %s, %s)", (title, author_id, publication_date, genre))
             print(f"{title} added to the system successfully.\n")
             conn.commit()
         except Exception as e:
@@ -81,9 +88,18 @@ def display_books(books):
     print()
     return True
 
-def find_book_index(books, title):
+def find_book_index(conn, title):
     #Return the index of the book, or None if the book is not found
-    for index, book in enumerate(books):
-        if book.title == title:
-            return index
-    return None
+    # for index, book in enumerate(books):
+    #     if book.title == title:
+    #         return index
+    # return None
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM books WHERE title = %s", (title,))
+            book = cursor.fetchone()
+            if book:
+                return book[0]
+        except Exception as e:
+            print(f"Error: {e}")
