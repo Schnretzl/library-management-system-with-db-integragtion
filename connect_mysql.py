@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 
 def connect_database():
-    db_name = 'e_commerce_db'
+    db_name = 'library_db'
     user = 'root'
     password = input('Please enter your MySQL password: ')
     host = 'localhost'
