@@ -1,14 +1,23 @@
 import user_menu
 from book import Book
 from user import User
+from connect_mysql import connect_database
 
 def add_book(books):
     title = input("Enter the title of the book: ")
     author = input("Enter the author of the book: ")
     genre = input("Enter the genre of the book: ")
     publication_date = input("Enter the publication date of the book: ")
-    books.append(Book(title, author, genre, publication_date))
-    print(f"{title} added to the system successfully.\n")
+    # books.append(Book(title, author, genre, publication_date))
+    conn = connect_database()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO books (title, author, genre, publication_date) VALUES (%s, %s, %s, %s)", (title, author, genre, publication_date))
+            print(f"{title} added to the system successfully.\n")
+            conn.commit()
+        except Exception as e:
+            print(f"Error: {e}")
     
 def borrow_book(books, users):
     book_title = input("Enter the title of the book you want to borrow: ")
