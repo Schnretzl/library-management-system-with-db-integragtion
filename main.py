@@ -43,8 +43,9 @@ def author_operations_menu():
     print("1. Add a new Author")
     print("2. View author details")
     print("3. Display all authors")
+    print("4. Edit author biography")
     choice = input("Enter your choice: ")
-    return choice if validate_menu_option(choice, 3) else "Invalid choice in author menu"
+    return choice if validate_menu_option(choice, 4) else "Invalid choice in author menu"
 
 def main():
     conn = connect_database()
@@ -80,6 +81,8 @@ def main():
                 author_menu.view_author_details(conn)
             elif author_menu_choice == '3':
                 author_menu.display_authors(conn)
+            elif author_menu_choice == '4':
+                author_menu.edit_author_bio(conn)
         
         elif main_menu_choice == '4':
             break
