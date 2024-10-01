@@ -1,18 +1,18 @@
 import user_menu
-from book import Book
-from user import User
+from datetime import datetime
 
 def add_book(conn):
     title = input("Enter the title of the book: ")
     author = input("Enter the author of the book: ")
     genre = input("Enter the genre of the book: ")
-    publication_date = input("Enter the publication date of the book: ")
+    publication_date = input("Enter the publication date of the book(YYYY-MM-DD): ")
     # books.append(Book(title, author, genre, publication_date))
     if conn is not None:
         try:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM authors WHERE name = %s", (author,))
-            author_id = cursor.fetchone()[0] if cursor.fetchone() else None
+            result = cursor.fetchone()
+            author_id = result[0] if result else None
             if author_id is None:
                 # Add author to Author database if missing
                 cursor.execute("INSERT INTO authors (name) VALUES (%s)", (author,))
@@ -25,20 +25,36 @@ def add_book(conn):
         except Exception as e:
             print(f"Error: {e}")
     
-def borrow_book(books, users):
+def borrow_book(conn):
     book_title = input("Enter the title of the book you want to borrow: ")
-    book_title_index = find_book_index(books, book_title)
+    book_title_index = find_book_index(conn, book_title)
     if book_title_index is None:
         print("Book not found.")
         return False
     user_id = user_menu.get_valid_user_id()
-    user_index = user_menu.find_user_index(users, user_id)
+    user_index = user_menu.find_user_index(conn, user_id)
     if user_index is None:
         print("User not found.")
         return False
-    if books[book_title_index].borrow():
-        users[user_index].borrowed_books.append(books[book_title_index])
-        return True
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM books WHERE id = %s", (book_title_index,))
+            book = cursor.fetchone()
+            cursor.execute("SELECT * FROM users WHERE id = %s", (user_index,))
+            user = cursor.fetchone()
+            borrow_date = datetime.now().strftime('%Y-%m-%d')
+            if book[5]:
+                cursor.execute("INSERT INTO borrowed_books (user_id, book_id, borrow_date) VALUES (%s, %s, %s)", (user_index, book_title_index, borrow_date))
+                cursor.execute("UPDATE books SET availability = FALSE WHERE id = %s", (book_title_index,))
+                conn.commit()
+                print(f"{book[1]} borrowed successfully by {user[1]}.")
+                return True
+            else:
+                print("Book is not available.")
+                return False
+        except Exception as e:
+            print(f"Error: {e}")
     else:
         print("Book is not available.")
         return False
