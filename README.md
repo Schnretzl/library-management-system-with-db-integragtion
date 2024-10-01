@@ -36,3 +36,6 @@ Prompts the user for an author's name, and displays the author's name and bio, i
 
 ### Display all authors
 Displays a list of names of all authors.
+
+### Edit Author Biography
+Prompts the user for an author's name.  If the author is found, prompts the user for a new bio for the author and adds it to the library.
