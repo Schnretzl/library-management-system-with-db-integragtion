@@ -1,5 +1,37 @@
 # Library Management System
 This is a system for managing books, users, and authors in a library.
+This is managed in a MySQL database.  Tables are stored in a database titled 'library_db', and are created using the following queries:
+
+    CREATE TABLE books (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        author_id INT,
+        genre VARCHAR(20) NOT NULL,
+        publication_date DATE,
+        availability BOOLEAN DEFAULT 1,
+        FOREIGN KEY (author_id) REFERENCES authors(id),
+    );
+
+    CREATE TABLE authors (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        bio TEXT
+    );
+
+    CREATE TABLE users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+    );
+
+    CREATE TABLE borrowed_books (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        book_id INT,
+        borrow_date DATE NOT NULL,
+        return_date DATE,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (book_id) REFERENCES books(id)
+    );
 
 ## Book Operations
 ### Add a new book
