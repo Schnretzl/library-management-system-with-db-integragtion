@@ -47,6 +47,22 @@ def display_authors(conn):
                 print()
         except Exception as e:
             print(f"Error: {e}")
+            
+def edit_author_bio(conn):
+    author_name = input("Enter the name of the author: ")
+    author_index = find_author_index(conn, author_name)
+    if author_index is None:
+        print("Author not found.")
+        return False
+    new_bio = input("Enter the new biography: ")
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE authors SET bio = %s WHERE id = %s", (new_bio, author_index))
+            print("Biography updated successfully.")
+            conn.commit()
+        except Exception as e:
+            print(f"Error: {e}")
         
 def find_author_index(conn, author_name):
     #Return the index of the author, or None if the author is not found
