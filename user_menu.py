@@ -1,5 +1,3 @@
-from user import User
-
 def add_user(conn):
     name = input("Enter the name of the user: ")
     # users.append(User(name))
@@ -13,17 +11,29 @@ def add_user(conn):
             print(f"Error: {e}")
     print()
     
-def view_user_details(users):
+def view_user_details(conn):
     user_id = get_valid_user_id()
-    user_index = find_user_index(users, user_id)
+    user_index = find_user_index(conn, user_id)
     if user_index is None:
         print("User not found.")
         return False
-    print(f"Name: {users[user_index].name}")
-    print(f"ID: {users[user_index].id}")
-    print("Borrowed Books:")
-    for book in users[user_index].borrowed_books:
-        print(book.title)
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = %s", (user_index,))
+            user = cursor.fetchone()
+            print(f"Name: {user[1]}")
+            print(f"ID: {user[0]}")
+            print("Borrowed Books:")
+            cursor.execute("SELECT * FROM borrowed_books WHERE user_id = %s AND return_date IS NULL", (user_index,))
+            borrowed_books = cursor.fetchall()
+            for book in borrowed_books:
+                cursor.execute("SELECT * FROM books WHERE id = %s", (book[2],))
+                book_details = cursor.fetchone()
+                print(f"{book_details[1]}")
+            print()
+        except Exception as e:
+            print(f"Error: {e}")
     print()
 
 def display_users(users):
@@ -32,12 +42,16 @@ def display_users(users):
         print(f"ID: {user.id}")
         print()
         
-def find_user_index(users, user_id):
+def find_user_index(conn, user):
     #Return the index of the user, or None if the user is not found
-    for index, user in enumerate(users):
-        if user.id == user_id:
-            return index
-    return None
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE name = %s", (user,))
+            user_index = cursor.fetchone()[0] if cursor.fetchone() else None
+            return user_index
+        except Exception as e:
+            print(f"Error: {e}")    
 
 def get_valid_user_id():
     while True:
