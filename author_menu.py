@@ -33,7 +33,7 @@ def view_author_details(conn):
             if books:
                 print("Books:")
                 for book in books:
-                    status = " (checked out)" if book[5] else ""
+                    status = " (checked out)" if not book[5] else ""
                     print(f"{book[1]}{status}")
             print()
         except Exception as e:
