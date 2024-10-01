@@ -1,4 +1,3 @@
-from book import Book; from user import User; from author import Author
 import book_menu, user_menu, author_menu
 from connect_mysql import connect_database
 
@@ -49,9 +48,6 @@ def author_operations_menu():
 
 def main():
     conn = connect_database()
-    authors = [Author("J.R.R. Tolkien", "Biography of J.R.R. Tolkien")]
-    books = [Book("Lord of the Rings", "J.R.R. Tolkien", "fantasy", "1954")]
-    users = [User("John Doe")]
     while True:
         main_menu_choice = main_menu()
         if main_menu_choice == '1':
@@ -59,31 +55,31 @@ def main():
             if book_menu_choice == '1':
                 book_menu.add_book(conn)
             elif book_menu_choice == '2':
-                book_menu.borrow_book(books, users)
+                book_menu.borrow_book(conn)
             elif book_menu_choice == '3':
-                book_menu.return_book(books, users)
+                book_menu.return_book(conn)
             elif book_menu_choice == '4':
-                book_menu.search_book(books)
+                book_menu.search_book(conn)
             elif book_menu_choice == '5':
-                book_menu.display_books(books)
+                book_menu.display_books(conn)
             
         elif main_menu_choice == '2':
             user_menu_choice = user_operations_menu()
             if user_menu_choice == '1':
-                user_menu.add_user(users)
+                user_menu.add_user(conn)
             elif user_menu_choice == '2':
-                user_menu.view_user_details(users)
+                user_menu.view_user_details(conn)
             elif user_menu_choice == '3':
-                user_menu.display_users(users)
+                user_menu.display_users(conn)
                 
         elif main_menu_choice == '3':
             author_menu_choice = author_operations_menu()
             if author_menu_choice == '1':
-                author_menu.add_author(authors)
+                author_menu.add_author(conn)
             elif author_menu_choice == '2':
-                author_menu.view_author_details(authors)
+                author_menu.view_author_details(conn)
             elif author_menu_choice == '3':
-                author_menu.display_authors(authors)
+                author_menu.display_authors(conn)
         
         elif main_menu_choice == '4':
             break
