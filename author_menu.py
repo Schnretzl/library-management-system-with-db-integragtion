@@ -33,9 +33,20 @@ def view_author_details(conn):
             print(f"Error: {e}")
     
 def display_authors(conn):
-    for author in authors:
-        print(f"Name: {author.name}")
-    print()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM authors")
+            authors = cursor.fetchall()
+            if len(authors) == 0:
+                print("No authors in the system.")
+            else:
+                print("Authors:")
+                for author in authors:
+                    print(f"Name: {author[1]}")
+                print()
+        except Exception as e:
+            print(f"Error: {e}")
         
 def find_author_index(conn, author_name):
     #Return the index of the author, or None if the author is not found
