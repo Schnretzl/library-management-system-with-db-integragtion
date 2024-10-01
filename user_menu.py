@@ -38,11 +38,23 @@ def view_user_details(conn):
         except Exception as e:
             print(f"Error: {e}")
 
-def display_users(users):
-    for user in users:
-        print(f"Name: {user.name}")
-        print(f"ID: {user.id}")
-        print()
+def display_users(conn):
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users")
+            users = cursor.fetchall()
+            if len(users) == 0:
+                print("No users in the system.")
+            else:
+                print("Users:")
+                for user in users:
+                    print(f"Name: {user[1]}")
+                    print(f"ID: {user[0]}")
+                    print()
+        except Exception as e:
+            print(f"Error: {e}")
+
         
 def find_user_index(conn, user_id):
     if conn is not None:
