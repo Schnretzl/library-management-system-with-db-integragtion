@@ -28,6 +28,13 @@ def view_author_details(conn):
             author = cursor.fetchone()
             print(f"Name: {author[1]}")
             print(f"Biography: {author[2]}")
+            cursor.execute("SELECT * FROM books WHERE author_id = %s", (author_index,))
+            books = cursor.fetchall()
+            if books:
+                print("Books:")
+                for book in books:
+                    status = " (checked out)" if book[5] else ""
+                    print(f"{book[1]}{status}")
             print()
         except Exception as e:
             print(f"Error: {e}")
