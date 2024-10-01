@@ -6,7 +6,6 @@ def add_book(conn):
     author = input("Enter the author of the book: ")
     genre = input("Enter the genre of the book: ")
     publication_date = input("Enter the publication date of the book(YYYY-MM-DD): ")
-    # books.append(Book(title, author, genre, publication_date))
     if conn is not None:
         try:
             cursor = conn.cursor()
@@ -117,7 +116,8 @@ def display_books(conn):
             return False
         print("\nBooks in library:")
         for index, book in enumerate(books):
-            print(f"{index + 1}. {book[1]}")
+            status = " (checked out)" if not book[5] else ""
+            print(f"{index + 1}. {book[1]}{status}")
     print()
     return True
 
