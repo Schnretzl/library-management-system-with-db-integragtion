@@ -59,27 +59,31 @@ def borrow_book(conn):
         print("Book is not available.")
         return False
         
-def return_book(books, users):
+def return_book(conn):
+    return_date = datetime.now().strftime('%Y-%m-%d')
     user_id = user_menu.get_valid_user_id()
-    user_index = user_menu.find_user_index(users, user_id)
+    user_index = user_menu.find_user_index(conn, user_id)
     if user_index is None:
         print("User not found.")
         return False
     book_title = input("Enter the title of the book you want to return: ")
-    book_title_index = find_book_index(books, book_title)
-    user_book_index = find_book_index(users[user_index].borrowed_books, book_title)
-    if book_title_index is None:
-        print("Book not found.")
-        return False
-    elif user_book_index is None:
-        print("Book not borrowed.")
-        return False
-    elif books[book_title_index].return_book():
-        users[user_index].borrowed_books.remove(books[book_title_index])
-        return True
-    else:
-        print("Book is already available.")
-        return False
+    book_title_index = find_book_index(conn, book_title)
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM borrowed_books WHERE user_id = %s AND book_id = %s AND return_date IS NULL", (user_index, book_title_index))
+            result = cursor.fetchone()
+            borrowed_book_id = result[0] if result else None
+            if borrowed_book_id is None:
+                print("Book not borrowed.")
+                return False
+            cursor.execute("UPDATE borrowed_books SET return_date = %s WHERE id = %s", (return_date, borrowed_book_id))
+            cursor.execute("UPDATE books SET availability = TRUE WHERE id = %s", (book_title_index,))
+            conn.commit()
+            print(f"{book_title} returned successfully.")
+            return True
+        except Exception as e:
+            print(f"Error: {e}")
     
 def search_book(conn):
     title = input("Enter the title of the book: ")
